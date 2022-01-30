@@ -15,4 +15,5 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.5")
     implementation("org.eclipse.jgit:org.eclipse.jgit:6.0.0.202111291000-r")
+    implementation("org.jtwig:jtwig-core:5.87.0.RELEASE")
 }

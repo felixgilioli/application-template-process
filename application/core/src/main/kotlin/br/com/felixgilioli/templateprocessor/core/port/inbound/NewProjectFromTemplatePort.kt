@@ -4,5 +4,5 @@ import br.com.felixgilioli.templateprocessor.core.port.model.NewProjectFromTempl
 
 interface NewProjectFromTemplatePort {
 
-    fun generateNewProject(info: NewProjectFromTemplateInfo)
+    fun generateNewProject(info: NewProjectFromTemplateInfo): ByteArray
 }
