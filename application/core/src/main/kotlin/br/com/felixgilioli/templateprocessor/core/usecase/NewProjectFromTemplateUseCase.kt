@@ -1,5 +1,6 @@
 package br.com.felixgilioli.templateprocessor.core.usecase
 
+import br.com.felixgilioli.templateprocessor.core.exception.TemplateNotFoundException
 import br.com.felixgilioli.templateprocessor.core.port.inbound.NewProjectFromTemplatePort
 import br.com.felixgilioli.templateprocessor.core.port.model.NewProjectFromTemplateInfo
 import br.com.felixgilioli.templateprocessor.core.port.outbound.CloneProjectPort
@@ -29,7 +30,8 @@ class NewProjectFromTemplateUseCase(
 
         val hasProperties = !info.properties.isNullOrEmpty()
 
-        val files = templateFile.listFiles().toMutableList()
+        val files = templateFile.listFiles()?.toMutableList() ?: throw TemplateNotFoundException()
+
         files.removeAt(0)//todo
 
         var i = 0
@@ -39,7 +41,10 @@ class NewProjectFromTemplateUseCase(
             val fileName = file.name
 
             if (file.isDirectory) {
-                files.addAll(file.listFiles())
+                val children = file.listFiles()
+                if (children != null) {
+                    files.addAll(children)
+                }
             }
 
             if (hasProperties) {
