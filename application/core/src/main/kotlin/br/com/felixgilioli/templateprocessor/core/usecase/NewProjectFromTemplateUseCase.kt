@@ -6,6 +6,7 @@ import br.com.felixgilioli.templateprocessor.core.port.model.NewProjectFromTempl
 import br.com.felixgilioli.templateprocessor.core.port.outbound.CloneProjectPort
 import br.com.felixgilioli.templateprocessor.core.port.outbound.FileProcessPort
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
 import java.io.PrintWriter
 import java.nio.file.Files
@@ -36,8 +37,6 @@ class NewProjectFromTemplateUseCase(
         while (i < files.size) {
             var file = files[i]
 
-            val fileName = file.name
-
             if (file.isDirectory) {
                 val children = file.listFiles()
                 if (children != null) {
@@ -46,35 +45,46 @@ class NewProjectFromTemplateUseCase(
             }
 
             if (hasProperties) {
-                info.properties?.forEach { (key, value) ->
-                    if (fileName.contains("__${key}__")) {
-                        val newName = fileName.replace("__${key}__", value.toString())
-                        file = Files.move(file.toPath(), file.toPath().resolveSibling(newName)).toFile()
-                    }
-                }
-
-                if (!file.isDirectory) {
-                    val processedContent = fileProcessPort.process(Files.readString(file.toPath()), info.properties!!)
-
-                    val printWriter = PrintWriter(file)
-                    printWriter.println(processedContent)
-                    printWriter.close()
-                }
+                file = renameFilesAndDirectories(file, info.properties!!)
+                replaceFileContent(file, info.properties)
             }
 
             i++
         }
 
-        return pack(templateFile.absolutePath)
+        return zipDirectory(templateFile.absolutePath)
             .also { templateFile.deleteRecursively() }
     }
 
-    private fun pack(sourceDirPath: String): ByteArray {
+    private fun replaceFileContent(file: File, properties: Map<String, Any>) {
+        if (!file.isDirectory) {
+            val processedContent = fileProcessPort.process(Files.readString(file.toPath()), properties)
+
+            val printWriter = PrintWriter(file)
+            printWriter.println(processedContent)
+            printWriter.close()
+        }
+    }
+
+    private fun renameFilesAndDirectories(file: File, properties: Map<String, Any>): File {
+        var fileName = file.name
+        
+        var renamedFile = file
+        properties.forEach { (key, value) ->
+            if (fileName.contains("__${key}__")) {
+                fileName = fileName.replace("__${key}__", value.toString())
+                renamedFile = Files.move(renamedFile.toPath(), renamedFile.toPath().resolveSibling(fileName)).toFile()
+            }
+        }
+        return renamedFile
+    }
+
+    private fun zipDirectory(directoryPath: String): ByteArray {
         val outputStream = ByteArrayOutputStream()
         ZipOutputStream(outputStream).use { zs ->
-            val pp = Paths.get(sourceDirPath)
+            val pp = Paths.get(directoryPath)
             Files.walk(pp)
-                .filter { !Files.isDirectory(it)}
+                .filter { !Files.isDirectory(it) }
                 .forEach { path ->
                     val zipEntry = ZipEntry(pp.relativize(path).toString())
                     try {
