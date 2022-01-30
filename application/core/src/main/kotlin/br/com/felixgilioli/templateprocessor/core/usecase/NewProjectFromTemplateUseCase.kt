@@ -32,8 +32,6 @@ class NewProjectFromTemplateUseCase(
 
         val files = templateFile.listFiles()?.toMutableList() ?: throw TemplateNotFoundException()
 
-        files.removeAt(0)//todo
-
         var i = 0
         while (i < files.size) {
             var file = files[i]

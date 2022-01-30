@@ -13,5 +13,6 @@ class CloneProjectServiceImpl : CloneProjectPort {
             .setURI(repositoryUrl)
             .setDirectory(directory)
             .call()
+            .close()
     }
 }
