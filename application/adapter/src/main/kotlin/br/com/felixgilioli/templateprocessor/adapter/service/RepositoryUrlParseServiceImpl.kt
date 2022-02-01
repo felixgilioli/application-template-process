@@ -12,30 +12,32 @@ class RepositoryUrlParseServiceImpl : RepositoryUrlParsePort {
     companion object {
         const val GITHUB_DOMAIN = "github.com"
         const val BITBUCKET_DOMAIN = "bitbucket.org"
+        const val GITLAB_DOMAIN = "gitlab.com"
+
+        const val TEMPLATE_DEFINITION_FILE_NAME = "template-definition.yaml"
     }
 
     override fun parse(repositoryUrl: String): String = with(repositoryUrl) {
+        val repositoryInformation = getRepositoryInformation(repositoryUrl)
+        val defaultBranch = getDefaultBranch(repositoryUrl)
         return when {
             contains(GITHUB_DOMAIN) -> {
-                val parameters = UriComponentsBuilder.fromHttpUrl(repositoryUrl).build().pathSegments
-                val repositoryInformation = RepositoryInformation(user = parameters[0], repositoryName = parameters[1])
-                "https://raw.githubusercontent.com/${repositoryInformation.user}/${repositoryInformation.getRepositoryNameWithoutExtension()}/${
-                    getDefaultBranch(
-                        repositoryUrl
-                    )
-                }/template-definition.yaml"
+                "https://raw.githubusercontent.com/${repositoryInformation.user}/${repositoryInformation.getRepositoryNameWithoutExtension()}/${defaultBranch}/${TEMPLATE_DEFINITION_FILE_NAME}"
             }
             contains(BITBUCKET_DOMAIN) -> {
-                val parameters = UriComponentsBuilder.fromHttpUrl(repositoryUrl).build().pathSegments
-                val repositoryInformation = RepositoryInformation(user = parameters[0], repositoryName = parameters[1])
-                "https://bitbucket.org/${repositoryInformation.user}/${repositoryInformation.repositoryName}/raw/${
-                    getDefaultBranch(
-                        repositoryUrl
-                    )
-                }/template-definition.yaml"
+                "https://bitbucket.org/${repositoryInformation.user}/${repositoryInformation.repositoryName}/raw/${defaultBranch}/${TEMPLATE_DEFINITION_FILE_NAME}"
+            }
+            contains(GITLAB_DOMAIN) -> {
+                "https://gitlab.com/${repositoryInformation.user}/${repositoryInformation.getRepositoryNameWithoutExtension()}/-/raw/${defaultBranch}/${TEMPLATE_DEFINITION_FILE_NAME}"
             }
             else -> throw InvalidGitRepositoryException()
         }
+    }
+
+    private fun getRepositoryInformation(repositoryUrl: String): RepositoryInformation {
+        val parameters = UriComponentsBuilder.fromHttpUrl(repositoryUrl).build().pathSegments
+        val repositoryInformation = RepositoryInformation(user = parameters[0], repositoryName = parameters[1])
+        return repositoryInformation
     }
 
     private fun getDefaultBranch(repositoryUrl: String): String {
