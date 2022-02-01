@@ -6,7 +6,7 @@ document.querySelector("#download-project-btn").onclick = function(event) {
     var projectName = document.querySelector("#projectArtifactName").value;
 
     var repositoryUrl = getQueryParams(document.location.search)["repositoryUrl"];
-//    repositoryUrl = "https://github.com/felixgilioli/template01-example.git";
+
     var dto = {
         "projectName": projectName,
         "repositoryUrl": repositoryUrl,
