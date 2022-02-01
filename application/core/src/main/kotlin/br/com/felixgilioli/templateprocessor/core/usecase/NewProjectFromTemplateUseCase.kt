@@ -28,6 +28,7 @@ class NewProjectFromTemplateUseCase(
         cloneProjectPort.clone(templateFile, info.repositoryUrl)
 
         Paths.get(templateFile.path, ".git").toFile().deleteRecursively()
+        Paths.get(templateFile.path, "template-definition.yaml").toFile().delete()
 
         val hasProperties = !info.properties.isNullOrEmpty()
 

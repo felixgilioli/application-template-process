@@ -17,4 +17,5 @@ dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:6.0.0.202111291000-r")
     implementation("org.jtwig:jtwig-core:5.87.0.RELEASE")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.springframework.boot:spring-boot-starter-freemarker")
 }
