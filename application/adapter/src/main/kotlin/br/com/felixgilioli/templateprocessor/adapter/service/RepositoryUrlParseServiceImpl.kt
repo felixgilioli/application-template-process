@@ -36,12 +36,16 @@ class RepositoryUrlParseServiceImpl : RepositoryUrlParsePort {
 
     private fun getRepositoryInformation(repositoryUrl: String): RepositoryInformation {
         val parameters = UriComponentsBuilder.fromHttpUrl(repositoryUrl).build().pathSegments
-        val repositoryInformation = RepositoryInformation(user = parameters[0], repositoryName = parameters[1])
-        return repositoryInformation
+        return RepositoryInformation(user = parameters[0], repositoryName = parameters[1])
     }
 
     private fun getDefaultBranch(repositoryUrl: String): String {
-        val headInfo = (Git.lsRemoteRepository().setRemote(repositoryUrl).callAsMap())["HEAD"]?.target?.name?.split("/")
+        val headInfo = (Git.lsRemoteRepository()
+            .setRemote(repositoryUrl)
+            .callAsMap())["HEAD"]
+            ?.target
+            ?.name
+            ?.split("/")
         return if (headInfo != null) headInfo[2] else "main"
     }
 
