@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
 
 @Service
-class RepositoryUrlParseService : RepositoryUrlParsePort {
+class RepositoryUrlParseServiceImpl : RepositoryUrlParsePort {
 
     companion object {
         const val GITHUB_DOMAIN = "github.com"
