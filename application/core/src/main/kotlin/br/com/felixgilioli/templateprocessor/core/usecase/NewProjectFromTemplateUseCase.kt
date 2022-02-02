@@ -38,16 +38,16 @@ class NewProjectFromTemplateUseCase(
         while (i < files.size) {
             var file = files[i]
 
+            if (hasProperties) {
+                file = renameFilesAndDirectories(file, info.properties!!)
+                replaceFileContent(file, info.properties)
+            }
+
             if (file.isDirectory) {
                 val children = file.listFiles()
                 if (children != null) {
                     files.addAll(children)
                 }
-            }
-
-            if (hasProperties) {
-                file = renameFilesAndDirectories(file, info.properties!!)
-                replaceFileContent(file, info.properties)
             }
 
             i++
